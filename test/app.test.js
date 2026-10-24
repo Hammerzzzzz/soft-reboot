@@ -133,7 +133,9 @@ test("free endpoints and llms.txt", async () => {
 });
 
 test("config refuses unsafe settings", () => {
-  assert.throws(() => loadConfig({}), /PAY_TO/);
+  assert.throws(() => loadConfig({}), /PAY_TO.*not set/);
+  assert.throws(() => loadConfig({ PAY_TO: "0x123" }), /got "0x123", 5 characters/);
+  assert.equal(loadConfig({ PAY_TO: ` "${PAY_TO}"\n` }).payTo, PAY_TO);
   assert.throws(() => loadConfig({ PAY_TO, NETWORK: "base" }), /CDP_API_KEY_ID/);
   assert.throws(() => loadConfig({ PAY_TO, PRICE: "50 cents" }), /PRICE/);
   assert.equal(loadConfig({ PAY_TO, NETWORK: "base", CDP_API_KEY_ID: "id", CDP_API_KEY_SECRET: "s" }).network.id, "eip155:8453");

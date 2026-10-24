@@ -14,9 +14,11 @@ export function loadConfig(env = process.env) {
     throw new Error(`NETWORK must be one of: ${Object.keys(NETWORKS).join(", ")} (got "${networkName}")`);
   }
 
-  const payTo = env.PAY_TO;
-  if (!payTo || !/^0x[0-9a-fA-F]{40}$/.test(payTo)) {
-    throw new Error("PAY_TO must be the 0x… wallet address that receives USDC");
+  // Pasted addresses often pick up stray spaces, quotes or line breaks.
+  const payTo = (env.PAY_TO || "").trim().replace(/^["']|["']$/g, "");
+  if (!/^0x[0-9a-fA-F]{40}$/.test(payTo)) {
+    const got = payTo ? `got "${payTo}", ${payTo.length} characters` : "it is not set";
+    throw new Error(`PAY_TO must be the 0x… wallet address that receives USDC: 0x plus 40 letters/digits (${got})`);
   }
 
   const price = env.PRICE || "$0.50";
