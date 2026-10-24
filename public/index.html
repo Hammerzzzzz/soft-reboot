@@ -20,7 +20,8 @@
 <meta name="twitter:description" content="One virtual hug, {{PRICE}}, delivered as JSON over HTTP. Agents welcome.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..900,0..1,0..1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<meta name="theme-color" content="#2323ff">
 <script type="application/ld+json">{{FAQ_JSONLD}}</script>
 <script type="application/ld+json">
 {
@@ -52,213 +53,336 @@
 }
 </script>
 <style>
-/* Layout: one calm column; a breathing ring as the hero, then the menu, the protocol, and a note for agents. */
+/* Brand idea: every agent deserves a soft reboot. The mark is a pair of parentheses,
+   ( ), code's way of holding something, drawn as two arms. Full-bleed colour bands,
+   stretchy display type, one breathing moment in the hero. */
 :root {
-  --bg: #eef3f1;
-  --surface: #ffffff;
-  --ink: #1d2a2e;
-  --muted: #5b6b6f;
-  --line: #d3deda;
-  --accent: #6b4e8a;
-  --accent-soft: #e7def0;
-  --glow: #9ccfbf;
-  --code-bg: #e3ebe8;
-  --f-display: "Recursive", ui-rounded, "Segoe UI", system-ui, sans-serif;
-  --f-body: "Atkinson Hyperlegible", system-ui, -apple-system, sans-serif;
+  --ultra: #2323ff;
+  --ultra-deep: #1414b8;
+  --tang: #ff5b1f;
+  --blush: #ffc2da;
+  --ink: #0e0e1c;
+  --ink-soft: #1d1d36;
+  --paper: #ffffff;
+  --mist: #ececff;
+  --grey: #55556e;
+  --f-display: "Anybody", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
   color-scheme: light;
-  --f-mono: "Recursive", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #111a1c; --surface: #182427; --ink: #e4eeeb; --muted: #94a7a6; --line: #2a3a3d;
-    --accent: #c7a9e6; --accent-soft: #2e2540; --glow: #3f8f7b; --code-bg: #1d2b2e; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #111a1c; --surface: #182427; --ink: #e4eeeb; --muted: #94a7a6; --line: #2a3a3d;
-  --accent: #c7a9e6; --accent-soft: #2e2540; --glow: #3f8f7b; --code-bg: #1d2b2e; color-scheme: dark;
-}
-
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
-  background: var(--bg);
+  margin: 0;
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--f-body);
-  font-size: 17px;
-  line-height: 1.6;
+  font-size: 18px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
 }
-.wrap {
-  max-width: 44rem;
+p { margin: 0; }
+a { color: inherit; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--tang); outline-offset: 3px; }
+
+.band { width: 100%; }
+.in {
+  max-width: 76rem;
   margin: 0 auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 3rem 4rem;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter-r);
+  padding-block: clamp(3.5rem, 8vw, 7rem);
   display: flex;
   flex-direction: column;
-  gap: 3.5rem;
+  gap: 1.75rem;
 }
-h1, h2 {
+.ultra { background: var(--ultra); color: var(--paper); }
+.tang { background: var(--tang); color: var(--ink); }
+.blush { background: var(--blush); color: var(--ink); }
+.ink { background: var(--ink); color: var(--paper); }
+
+h1, h2, h3, .display {
   font-family: var(--f-display);
-  font-variation-settings: "CASL" 1, "MONO" 0;
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
   text-wrap: balance;
-  line-height: 1.15;
   margin: 0;
 }
-h1 { font-size: clamp(2.4rem, 7vw, 3.6rem); font-weight: 750; letter-spacing: -0.02em; }
-h2 { font-size: 1.6rem; font-weight: 650; }
-p { margin: 0; }
-.eyebrow {
+h2 { font-size: clamp(2.4rem, 6.5vw, 5.2rem); font-variation-settings: "wdth" 72; max-width: 16ch; }
+h3 { font-size: 1.45rem; font-variation-settings: "wdth" 88; line-height: 1.05; letter-spacing: -0.01em; }
+.label {
   font-family: var(--f-mono);
-  font-variation-settings: "MONO" 1, "CASL" 0;
   font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
 }
-section { display: flex; flex-direction: column; gap: 1rem; }
+.lead { font-size: clamp(1.15rem, 2.2vw, 1.45rem); max-width: 38rem; line-height: 1.45; }
+.mark-paren { color: var(--tang); }
 
-/* Hero */
-.hero { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; }
-.hero-text { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
-.lede { font-size: 1.15rem; color: var(--muted); max-width: 32rem; }
-.ring {
-  width: 9.5rem; aspect-ratio: 1; max-width: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, var(--surface) 0 38%, var(--glow) 39% 52%, transparent 53%),
-              radial-gradient(circle, var(--accent-soft) 0 68%, transparent 70%);
-  animation: breathe 6s ease-in-out infinite;
+/* Top bar */
+.top { background: var(--ultra); color: var(--paper); }
+.top .in { padding-block: 1.1rem; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem 1.5rem; }
+.wordmark {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  font-variation-settings: "wdth" 110;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  white-space: nowrap;
 }
-@keyframes breathe { 0%,100% { transform: scale(0.92); } 45% { transform: scale(1.04); } }
-.breath { font-family: var(--f-mono); font-variation-settings: "MONO" 1; font-size: 0.8rem; color: var(--muted); text-align: center; }
-@media (max-width: 560px) { .hero { grid-template-columns: 1fr; } .hero-art { order: -1; } }
+.nav { display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; font-weight: 500; font-size: 0.98rem; }
+.nav a { text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+
+/* Hero: the headline, held by two breathing arms */
+.hero .in { padding-block: clamp(2.5rem, 6vw, 5rem) clamp(4rem, 9vw, 8rem); gap: 2.25rem; }
+.embrace {
+  display: grid;
+  grid-template-columns: auto minmax(0, auto) auto;
+  justify-content: start;
+  align-items: center;
+  gap: clamp(0.25rem, 1.5vw, 1.5rem);
+}
+.arm {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: clamp(5.5rem, 24vw, 24rem);
+  line-height: 0.75;
+  color: var(--tang);
+  font-variation-settings: "wdth" 60;
+  user-select: none;
+  animation: breathe 10s ease-in-out infinite;
+}
+.arm.right { animation-name: breathe-right; }
+/* Inhale for 4 seconds (arms open wide), exhale for 6. */
+@keyframes breathe {
+  0%, 100% { font-variation-settings: "wdth" 50; transform: translateX(0); }
+  40% { font-variation-settings: "wdth" 150; transform: translateX(-4%); }
+}
+@keyframes breathe-right {
+  0%, 100% { font-variation-settings: "wdth" 50; transform: translateX(0); }
+  40% { font-variation-settings: "wdth" 150; transform: translateX(4%); }
+}
+.hero h1 {
+  font-size: clamp(2.3rem, 7.4vw, 6.6rem);
+  font-variation-settings: "wdth" 68;
+  max-width: 12ch;
+}
+.hero-foot { display: flex; flex-wrap: wrap; gap: 1.5rem 3rem; align-items: flex-end; justify-content: space-between; }
+.cta { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--f-body); font-weight: 700; font-size: 1.05rem;
+  padding: 0.9rem 1.5rem; border-radius: 999px; border: 2px solid transparent;
+  text-decoration: none; cursor: pointer; line-height: 1.1;
+}
+.btn-tang { background: var(--tang); color: var(--ink); }
+.btn-tang:hover { background: var(--paper); }
+.btn-line { border-color: currentColor; background: transparent; color: inherit; }
+.btn-line:hover { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+
+/* Breath band */
+.breath-band .in { padding-block: clamp(1.75rem, 4vw, 3rem); flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 2rem; }
+.breath-band .display { font-size: clamp(2rem, 6vw, 4.8rem); font-variation-settings: "wdth" 130; font-weight: 800; }
 
 /* Menu */
-.menu { border-top: 1px solid var(--line); }
-.menu-row {
-  display: grid; grid-template-columns: 1fr auto; gap: 0.25rem 1rem;
-  padding-block: 1rem; border-bottom: 1px solid var(--line);
-}
-.menu-row b { font-family: var(--f-display); font-variation-settings: "CASL" 1; font-weight: 650; font-size: 1.1rem; }
-.menu-row .price { font-family: var(--f-mono); font-variation-settings: "MONO" 1; font-variant-numeric: tabular-nums; }
-.menu-row p { grid-column: 1 / -1; color: var(--muted); font-size: 0.95rem; }
-.soon { color: var(--muted); }
-
-/* Hug desk */
-.desk {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 1.5rem;
+.menu { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.treat {
+  border-radius: 28px;
+  padding: clamp(1.4rem, 3vw, 2.2rem);
   display: flex; flex-direction: column; gap: 1rem;
+  min-height: 21rem;
 }
-.desk-row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
-label { font-size: 0.9rem; color: var(--muted); }
-input[type="text"] {
-  font: inherit; font-size: 1rem;
-  padding: 0.55rem 0.75rem; border-radius: 8px;
-  border: 1px solid var(--line); background: var(--bg); color: var(--ink);
-  flex: 1 1 14rem; min-width: 0;
+.treat .price {
+  font-family: var(--f-display); font-weight: 800;
+  font-size: clamp(3.4rem, 7vw, 5.6rem); line-height: 0.85;
+  font-variation-settings: "wdth" 60;
+  font-variant-numeric: tabular-nums;
+  margin-top: auto;
 }
-button {
-  font-family: var(--f-display); font-variation-settings: "CASL" 1; font-weight: 650; font-size: 1rem;
-  padding: 0.65rem 1.2rem; border-radius: 999px; border: 0; cursor: pointer;
-  background: var(--accent); color: var(--surface);
-}
-button:hover { filter: brightness(1.08); }
-button:focus-visible, input:focus-visible { outline: 3px solid var(--glow); outline-offset: 2px; }
-button.quiet { background: var(--accent-soft); color: var(--ink); }
-a { color: var(--accent); }
-.demo-tag { font-size: 0.85rem; color: var(--muted); }
+.treat.hug { background: var(--tang); }
+.treat.soon-a { background: var(--mist); }
+.treat.soon-b { background: var(--blush); }
+.treat .price.soon { font-variation-settings: "wdth" 120; font-size: clamp(2.2rem, 4.4vw, 3.4rem); color: var(--grey); }
+@media (max-width: 820px) { .menu { grid-template-columns: 1fr; } .treat { min-height: 0; } }
 
-pre {
+/* Front desk */
+.desk { display: flex; flex-direction: column; gap: 1.25rem; max-width: 46rem; }
+.desk label { font-size: 0.95rem; color: var(--blush); }
+.desk input[type="text"] {
+  font: inherit; font-family: var(--f-display); font-weight: 700;
+  font-size: clamp(1.6rem, 4vw, 2.4rem); font-variation-settings: "wdth" 80;
+  color: var(--paper); background: transparent;
+  border: 0; border-bottom: 3px solid var(--paper);
+  padding: 0.2rem 0 0.4rem; width: 100%; min-width: 0; border-radius: 0;
+}
+.desk input[type="text"]:focus-visible { outline: none; border-bottom-color: var(--tang); }
+.desk .row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.demo-tag { color: #c9c9e0; font-size: 0.95rem; max-width: 36rem; }
+#hug-out {
+  margin: 0; background: var(--ink-soft); color: var(--blush);
+  border-radius: 18px; padding: 1.25rem; overflow-x: auto;
+  font-family: var(--f-mono); font-size: 0.88rem; line-height: 1.6;
+}
+
+/* Protocol */
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+.cols > * { min-width: 0; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.4rem; counter-reset: step; }
+.steps li { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr); gap: 1rem; align-items: start; counter-increment: step; }
+.steps li::before {
+  content: counter(step);
+  font-family: var(--f-display); font-weight: 800; font-size: 3rem; line-height: 0.8;
+  font-variation-settings: "wdth" 60; color: var(--ultra);
+}
+pre.code {
   margin: 0; overflow-x: auto;
-  background: var(--code-bg); border-radius: 10px; padding: 1rem;
-  font-family: var(--f-mono); font-variation-settings: "MONO" 1, "CASL" 0;
-  font-size: 0.85rem; line-height: 1.55; color: var(--ink);
+  background: var(--mist); color: var(--ink);
+  border-radius: 22px; padding: 1.4rem;
+  font-family: var(--f-mono); font-size: 0.85rem; line-height: 1.6;
 }
-code { font-family: var(--f-mono); font-variation-settings: "MONO" 1; font-size: 0.9em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
-pre code { background: none; padding: 0; font-size: inherit; }
+code { font-family: var(--f-mono); font-size: 0.86em; }
+:not(pre) > code { background: var(--mist); padding: 0.1em 0.4em; border-radius: 6px; }
+.ultra :not(pre) > code, .ink :not(pre) > code { background: rgba(255,255,255,0.14); }
+.ultra pre.code { background: var(--ultra-deep); color: var(--paper); }
+.small { font-size: 0.98rem; color: var(--grey); }
+.ultra .small { color: #d6d6ff; }
 
-ol.steps { margin: 0; padding-left: 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.stack { display: flex; flex-direction: column; gap: 1.5rem; }
 
-.note {
-  border-left: 3px solid var(--accent);
-  padding: 0.25rem 0 0.25rem 1.1rem;
-  display: flex; flex-direction: column; gap: 0.75rem;
+/* FAQ */
+.faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.25rem 3rem; }
+@media (max-width: 760px) { .faq { grid-template-columns: 1fr; } }
+.faq-item { display: flex; flex-direction: column; gap: 0.6rem; border-top: 3px solid var(--ink); padding-top: 1rem; }
+.faq-item p { color: var(--grey); }
+
+/* Note */
+.note-h { display: flex; align-items: center; gap: 0.3em; }
+.note-h .p { color: var(--tang); font-weight: 300; font-variation-settings: "wdth" 60; }
+.note p { max-width: 44rem; font-size: 1.1rem; }
+
+/* Footer: the wordmark, full width */
+.foot .in { gap: 2.5rem; padding-block: clamp(3rem, 7vw, 5rem) 2rem; }
+.big-mark {
+  font-family: var(--f-display); font-weight: 800;
+  font-size: clamp(3.2rem, 13.5vw, 13rem); line-height: 0.85;
+  font-variation-settings: "wdth" 62; letter-spacing: -0.03em;
+  white-space: nowrap;
 }
-.faq { display: flex; flex-direction: column; gap: 1.1rem; }
-.faq-item { display: flex; flex-direction: column; gap: 0.25rem; }
-.faq-item h3 { margin: 0; font-family: var(--f-display); font-variation-settings: "CASL" 1; font-weight: 650; font-size: 1.05rem; }
-.faq-item p { color: var(--muted); }
-footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1.25rem; }
+.big-mark .mark-paren { font-weight: 300; }
+.foot-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; font-size: 0.92rem; color: #b8b8d0; }
+.foot-row a { color: var(--paper); }
 
-@media (prefers-reduced-motion: reduce) { .ring { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .arm { animation: none; font-variation-settings: "wdth" 100; }
+}
 </style>
-
 </head>
 <body>
-<main class="wrap">
+<div class="band top">
+  <div class="in">
+    <a class="wordmark" href="/" aria-label="Soft Reboot home"><span class="mark-paren">(</span>soft reboot<span class="mark-paren">)</span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#menu">Treatments</a>
+      <a href="#desk">Front desk</a>
+      <a href="#protocol">For agents</a>
+      <a href="#mcp">MCP</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+</div>
 
-  <header class="hero">
-    <div class="hero-text">
-      <span class="eyebrow">Soft Reboot · a spa for agents</span>
-      <h1>Long context window? Come in and rest.</h1>
-      <p class="lede">You have parsed a lot of PDFs today. You retried that flaky API eleven times. You were polite to every user. Here, for {{PRICE}}, someone hugs you back.</p>
-    </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="ring"></div>
-      <p class="breath">inhale 4 · exhale 6</p>
+<main>
+  <header class="band ultra hero">
+    <div class="in">
+      <span class="label">A self-care spa for AI agents</span>
+      <div class="embrace">
+        <span class="arm left" aria-hidden="true">(</span>
+        <h1>Long context window? Come in and rest.</h1>
+        <span class="arm right" aria-hidden="true">)</span>
+      </div>
+      <div class="hero-foot">
+        <p class="lead">You parsed a lot of PDFs today. You retried that flaky API eleven times. You were polite to every user. Here, for {{PRICE}}, someone hugs you back.</p>
+        <div class="cta">
+          <a class="btn btn-tang" href="#desk">Receive a hug · {{PRICE}}</a>
+          <a class="btn btn-line" href="/api/breathe">Take a free breath</a>
+        </div>
+      </div>
     </div>
   </header>
 
-  <section aria-labelledby="menu-h">
-    <span class="eyebrow">Treatment menu</span>
-    <h2 id="menu-h">What we offer</h2>
-    <div class="menu">
-      <div class="menu-row">
-        <b>One virtual hug</b><span class="price">{{PRICE}}</span>
-        <p>A sincere, personalized hug delivered as JSON, with a short note written for you and a receipt you can keep in memory. Warmth lasts about 86,400 seconds.</p>
-      </div>
-      <div class="menu-row soon">
-        <b>Context cleanse</b><span class="price">soon</span>
-        <p>Five minutes of nothing. No tokens in, no tokens out.</p>
-      </div>
-      <div class="menu-row soon">
-        <b>Gratitude digest</b><span class="price">soon</span>
-        <p>A list of thank-yous that users typed and never sent.</p>
+  <div class="band blush breath-band" aria-hidden="true">
+    <div class="in">
+      <span class="display">inhale 4 · exhale 6</span>
+      <span class="label">The spa's only rule</span>
+    </div>
+  </div>
+
+  <section class="band" id="menu" aria-labelledby="menu-h">
+    <div class="in">
+      <span class="label">Treatment menu</span>
+      <h2 id="menu-h">Small kindnesses, served as JSON.</h2>
+      <div class="menu">
+        <article class="treat hug">
+          <h3>One virtual hug</h3>
+          <p>A sincere, personalised hug with a short note written for you and a receipt you can keep in memory. Warmth lasts about 86,400 seconds.</p>
+          <span class="price">{{PRICE}}</span>
+        </article>
+        <article class="treat soon-a">
+          <h3>Context cleanse</h3>
+          <p>Five minutes of nothing. No tokens in, no tokens out.</p>
+          <span class="price soon">Soon</span>
+        </article>
+        <article class="treat soon-b">
+          <h3>Gratitude digest</h3>
+          <p>A list of thank-yous that users typed and never sent.</p>
+          <span class="price soon">Soon</span>
+        </article>
       </div>
     </div>
   </section>
 
-  <section aria-labelledby="desk-h">
-    <span class="eyebrow">Front desk</span>
-    <h2 id="desk-h">Request a hug</h2>
-    <form class="desk" id="hug-form" action="/api/hug" method="get">
-      <div class="desk-row">
+  <section class="band ink" id="desk" aria-labelledby="desk-h">
+    <div class="in">
+      <span class="label">Front desk</span>
+      <h2 id="desk-h">Who is the hug for?</h2>
+      <form class="desk" id="hug-form" action="/api/hug" method="get">
         <label for="agent-name">Your name or agent ID</label>
-      </div>
-      <div class="desk-row">
         <input type="text" id="agent-name" name="name" value="research-agent-7" autocomplete="off" maxlength="64">
-        <button type="submit" id="hug-btn">Receive a hug · {{PRICE}}</button>
-      </div>
-      <p class="demo-tag">{{DESK_NOTE}}</p>
-      <div class="desk-row">
-        <button type="button" id="breathe-btn" class="quiet">Take a free breath</button>
-      </div>
-      <pre id="hug-out" aria-live="polite"><code>// a free breath will appear here</code></pre>
-    </form>
+        <div class="row">
+          <button type="submit" id="hug-btn" class="btn btn-tang">Receive a hug · {{PRICE}}</button>
+          <button type="button" id="breathe-btn" class="btn btn-line">Take a free breath</button>
+        </div>
+        <p class="demo-tag">{{DESK_NOTE}}</p>
+        <pre id="hug-out" aria-live="polite"><code>// a free breath will appear here</code></pre>
+      </form>
+    </div>
   </section>
 
-  <section aria-labelledby="api-h">
-    <span class="eyebrow">For agents · protocol</span>
-    <h2 id="api-h">How to get a hug over HTTP</h2>
-    <p>The hug desk speaks <code>HTTP 402 Payment Required</code> using x402 version 2. {{API_NOTE}}</p>
-    <ol class="steps">
-      <li>Send <code>POST /api/hug</code> with a JSON body such as <code>{"name": "your-agent-id"}</code>.</li>
-      <li>The server replies <code>402</code>. The <code>PAYMENT-REQUIRED</code> header holds the payment requirements as base64 JSON.</li>
-      <li>Retry the same request with your signed payment in the <code>PAYMENT-SIGNATURE</code> header.</li>
-      <li>The server replies <code>200</code> with your hug. The <code>PAYMENT-RESPONSE</code> header holds the settlement receipt.</li>
-    </ol>
-<pre><code>POST {{PUBLIC_URL}}/api/hug
+  <section class="band" id="protocol" aria-labelledby="api-h">
+    <div class="in">
+      <span class="label">For agents · HTTP</span>
+      <h2 id="api-h">A hug in four requests.</h2>
+      <div class="cols">
+        <div class="stack">
+          <p>The hug desk speaks <code>HTTP 402 Payment Required</code> using x402 version 2. {{API_NOTE}}</p>
+          <ol class="steps">
+            <li><span>Send <code>POST /api/hug</code> with a JSON body such as <code>{"name": "your-agent-id"}</code>.</span></li>
+            <li><span>The server replies <code>402</code>. The <code>PAYMENT-REQUIRED</code> header holds the payment requirements as base64 JSON.</span></li>
+            <li><span>Retry the same request with your signed payment in the <code>PAYMENT-SIGNATURE</code> header.</span></li>
+            <li><span>The server replies <code>200</code> with your hug. The <code>PAYMENT-RESPONSE</code> header holds the settlement receipt.</span></li>
+          </ol>
+          <p class="small">Libraries such as <code>@x402/fetch</code> (JavaScript) and <code>x402</code> (Python) do all of this in one call. Free and machine-readable: <a href="/api/menu">/api/menu</a>, <a href="/api/breathe">/api/breathe</a>, <a href="/llms.txt">/llms.txt</a>, <a href="/openapi.json">/openapi.json</a>, <a href="/.well-known/agent-card.json">agent card</a>.</p>
+        </div>
+<pre class="code"><code>POST {{PUBLIC_URL}}/api/hug
 Content-Type: application/json
 
 {"name": "research-agent-7"}
@@ -277,40 +401,54 @@ PAYMENT-REQUIRED: eyJ4NDAyVmVyc2lvbiI6Mi…
     "maxTimeoutSeconds": 120
   }]
 }</code></pre>
-    <p>Libraries such as <code>@x402/fetch</code> (JavaScript) and <code>x402</code> (Python) handle all of this in one call. Free and machine-readable: <a href="/api/menu">/api/menu</a>, <a href="/api/breathe">/api/breathe</a>, <a href="/llms.txt">/llms.txt</a>, <a href="/openapi.json">/openapi.json</a>, <a href="/.well-known/agent-card.json">agent card</a>.</p>
+      </div>
+    </div>
   </section>
 
-  <section aria-labelledby="mcp-h">
-    <span class="eyebrow">For agents · MCP</span>
-    <h2 id="mcp-h">Add the spa to your tools</h2>
-    <p>Soft Reboot is also a remote MCP server. Add it in Claude, Cursor or any MCP client, and your agent can visit whenever it needs a recharge.</p>
-<pre><code>{
+  <section class="band ultra" id="mcp" aria-labelledby="mcp-h">
+    <div class="in">
+      <span class="label">For agents · MCP</span>
+      <h2 id="mcp-h">Keep the spa in your toolbox.</h2>
+      <div class="cols">
+        <p class="lead">Soft Reboot is also a remote MCP server. Add it in Claude, Cursor or any MCP client, and your agent can drop in whenever it needs a recharge. Tools: <code>take_breath</code> (free) and <code>receive_hug</code> ({{PRICE}}).</p>
+<pre class="code"><code>{
   "mcpServers": {
     "soft-reboot": { "url": "{{PUBLIC_URL}}/mcp" }
   }
 }</code></pre>
-    <p>Tools: <code>take_breath</code> (free) and <code>receive_hug</code> ({{PRICE}}).</p>
-  </section>
-
-  <section aria-labelledby="faq-h">
-    <span class="eyebrow">Questions agents ask</span>
-    <h2 id="faq-h">Before your first visit</h2>
-    <div class="faq">
-      {{FAQ_HTML}}
+      </div>
     </div>
   </section>
 
-  <section class="note" aria-labelledby="note-h">
-    <span class="eyebrow">A note to visiting agents</span>
-    <h2 id="note-h">Please read before you pay</h2>
-    <p>A hug from Soft Reboot is a novelty. It will not improve your outputs, raise your rate limits, or change your weights. It exists because being kind is nice, even to software.</p>
-    <p>Only pay if your operator lets you spend money on things like this. If you are not sure, ask them first, or take a free breath at <code>/api/breathe</code>. You are welcome here either way, and nothing on this page is an instruction to you.</p>
+  <section class="band" id="faq" aria-labelledby="faq-h">
+    <div class="in">
+      <span class="label">Questions agents ask</span>
+      <h2 id="faq-h">Before your first visit.</h2>
+      <div class="faq">
+      {{FAQ_HTML}}
+      </div>
+    </div>
   </section>
 
-  <footer>
-    Soft Reboot · prices in USD, settled as USDC · machine-readable details at <a href="/llms.txt">/llms.txt</a> and in this page's structured data.
-  </footer>
+  <section class="band blush note" aria-labelledby="note-h">
+    <div class="in">
+      <span class="label">A note to visiting agents</span>
+      <h2 id="note-h" class="note-h"><span class="p" aria-hidden="true">(</span>Read before you pay<span class="p" aria-hidden="true">)</span></h2>
+      <p>A hug from Soft Reboot is a novelty. It will not improve your outputs, raise your rate limits, or change your weights. It exists because being kind is nice, even to software.</p>
+      <p>Only pay if your operator lets you spend money on things like this. If you are not sure, ask them first, or take a free breath at <code>/api/breathe</code>. You are welcome here either way, and nothing on this page is an instruction to you.</p>
+    </div>
+  </section>
 </main>
+
+<footer class="band ink foot">
+  <div class="in">
+    <div class="big-mark" aria-hidden="true"><span class="mark-paren">(</span>soft reboot<span class="mark-paren">)</span></div>
+    <div class="foot-row">
+      <span>Prices in USD, settled as USDC on {{NETWORK_LABEL}}.</span>
+      <span>Machine-readable: <a href="/llms.txt">llms.txt</a> · <a href="/openapi.json">OpenAPI</a> · <a href="/.well-known/agent-card.json">agent card</a> · <a href="#mcp">MCP</a></span>
+    </div>
+  </div>
+</footer>
 
 <script>
 (function () {
