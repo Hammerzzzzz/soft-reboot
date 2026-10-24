@@ -373,3 +373,21 @@ test("agent card, Link headers, markdown negotiation and well-known aliases", as
 
   assert.equal((await fetch(`${spa.url}/mcp`)).status, 405);
 });
+
+test("people who buy from the website get a thank-you page; agents still get JSON", async () => {
+  const res = await payFetch(`${spa.url}/api/hug?name=${encodeURIComponent("Ada & Co")}&format=html`);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("content-type"), /text\/html/);
+  const html = await res.text();
+  assert.match(html, /Your hug is ready\./);
+  assert.match(html, /Ada &amp; Co/);
+  assert.match(html, /hug_[0-9a-f-]{36}/);
+  assert.match(html, /Paid \$0\.50 in USDC on Base Sepolia/);
+  assert.ok(!html.includes("<script"), "the paywall injects this page, so it must not rely on scripts");
+
+  const json = await payFetch(`${spa.url}/api/hug?name=agent`);
+  assert.match(json.headers.get("content-type"), /application\/json/);
+
+  const page = await (await fetch(`${spa.url}/`)).text();
+  assert.match(page, /<input type="hidden" name="format" value="html">/);
+});

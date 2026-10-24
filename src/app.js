@@ -22,6 +22,7 @@ import {
   renderFaqJsonLd,
 } from "./discovery.js";
 import { createMcpHandler } from "./mcp.js";
+import { renderThanksPage } from "./thanks.js";
 import { createStats, renderStatsPage } from "./stats.js";
 
 const PAGE = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
@@ -150,7 +151,14 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true, 
   // payment verifies, and settles it once this handler responds.
   const hug = name => (config.payments ? makeHug(name) : { ...makeHug(name), price: "free (payments are not switched on yet)" });
   app.post("/api/hug", (req, res) => res.json(hug(req.body?.name)));
-  app.get("/api/hug", (req, res) => res.json(hug(req.query.name)));
+  app.get("/api/hug", (req, res) => {
+    // The website's button adds format=html, so people get a thank-you page; agents get JSON.
+    if (req.query.format === "html") {
+      res.set("Cache-Control", "no-store");
+      return res.type("html").send(renderThanksPage(hug(req.query.name), config));
+    }
+    res.json(hug(req.query.name));
+  });
 
   // Free.
   app.get("/api/breathe", (req, res) => res.json(makeBreath()));

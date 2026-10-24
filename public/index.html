@@ -299,6 +299,7 @@ pre.code { margin: 0; overflow-x: auto; background: var(--kelp); color: var(--gl
       <form class="desk" id="hug-form" action="/api/hug" method="get">
         <label for="agent-name">Your name or agent ID</label>
         <input type="text" id="agent-name" name="name" value="research-agent-7" autocomplete="off" maxlength="64">
+        <input type="hidden" name="format" value="html">
         <div class="row">
           <button type="submit" id="hug-btn" class="btn btn-fill">Receive a hug · {{PRICE}}</button>
           <button type="button" id="breathe-btn" class="btn btn-line">Take a free breath</button>
