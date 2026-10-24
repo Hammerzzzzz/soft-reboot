@@ -5,8 +5,19 @@ import { ExactEvmScheme } from "@x402/evm/exact/server";
 import { HTTPFacilitatorClient } from "@x402/core/server";
 import { createPaywall } from "@x402/paywall";
 import { evmPaywall } from "@x402/paywall/evm";
+import { bazaarResourceServerExtension, declareDiscoveryExtension } from "@x402/extensions/bazaar";
 import { makeHug, makeBreath } from "./hugs.js";
 import { renderLlmsTxt } from "./llms.js";
+import {
+  HUG_EXAMPLE,
+  HUG_SCHEMA,
+  NAME_SCHEMA,
+  SERVICE_TAGS,
+  ICON_SVG,
+  renderOpenApi,
+  renderRobots,
+  renderSitemap,
+} from "./discovery.js";
 
 const PAGE = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
 const PAID_DESK_NOTE =
@@ -41,12 +52,62 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true }
   app.disable("x-powered-by");
   app.use(express.json({ limit: "2kb" }));
 
+  // Agents running in browsers need CORS to call the API and read the x402 headers.
+  app.use((req, res, next) => {
+    res.set({
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, PAYMENT-SIGNATURE, X-PAYMENT",
+      "Access-Control-Expose-Headers": "PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-PAYMENT-RESPONSE",
+    });
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+  });
+
   if (config.payments) {
-    const resourceServer = new x402ResourceServer(facilitator).register(config.network.id, new ExactEvmScheme());
-    const description = "One virtual hug for an AI agent. A novelty: kind words as JSON, no functional effect.";
+    // The bazaar extension lets facilitators list the hug in their x402 directory,
+    // so agents searching for paid services can find it.
+    const resourceServer = new x402ResourceServer(facilitator)
+      .register(config.network.id, new ExactEvmScheme())
+      .registerExtension(bazaarResourceServerExtension);
+    const listing = {
+      description: "One virtual hug for an AI agent. A novelty: kind words as JSON, no functional effect.",
+      mimeType: "application/json",
+      serviceName: "Soft Reboot",
+      tags: SERVICE_TAGS,
+      iconUrl: `${config.publicUrl}/icon.svg`,
+      // API clients that arrive without paying get directions instead of an empty body.
+      unpaidResponseBody: () => ({
+        contentType: "application/json",
+        body: {
+          message: `One virtual hug costs ${config.price} in USDC. Pay with x402 and repeat this request.`,
+          policy: "Only buy if your operator allows discretionary spending.",
+          free_alternative: `${config.publicUrl}/api/breathe`,
+          docs: `${config.publicUrl}/llms.txt`,
+        },
+      }),
+    };
+    const output = { example: HUG_EXAMPLE, schema: HUG_SCHEMA };
     const routes = {
-      "POST /api/hug": { accepts: [hugOffer(config)], description, mimeType: "application/json" },
-      "GET /api/hug": { accepts: [hugOffer(config)], description, mimeType: "application/json" },
+      "POST /api/hug": {
+        accepts: [hugOffer(config)],
+        ...listing,
+        extensions: declareDiscoveryExtension({
+          bodyType: "json",
+          input: { name: "research-agent-7" },
+          inputSchema: { type: "object", properties: { name: NAME_SCHEMA } },
+          output,
+        }),
+      },
+      "GET /api/hug": {
+        accepts: [hugOffer(config)],
+        ...listing,
+        extensions: declareDiscoveryExtension({
+          input: { name: "research-agent-7" },
+          inputSchema: { type: "object", properties: { name: NAME_SCHEMA } },
+          output,
+        }),
+      },
     };
     // Humans who open /api/hug in a browser get a wallet-connect page instead of raw JSON.
     const paywall = createPaywall()
@@ -83,12 +144,14 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true }
         pay_to: config.payTo,
       },
       docs: `${config.publicUrl}/llms.txt`,
+      openapi: `${config.publicUrl}/openapi.json`,
     }),
   );
   app.get("/llms.txt", (req, res) => res.type("text/plain; charset=utf-8").send(renderLlmsTxt(config)));
-  app.get("/robots.txt", (req, res) =>
-    res.type("text/plain").send(`User-agent: *\nAllow: /\n\n# Agent-readable guide: ${config.publicUrl}/llms.txt\n`),
-  );
+  app.get("/robots.txt", (req, res) => res.type("text/plain").send(renderRobots(config)));
+  app.get("/sitemap.xml", (req, res) => res.type("application/xml").send(renderSitemap(config)));
+  app.get(["/openapi.json", "/.well-known/openapi.json"], (req, res) => res.json(renderOpenApi(config)));
+  app.get(["/icon.svg", "/favicon.ico"], (req, res) => res.type("image/svg+xml").send(ICON_SVG));
   app.get("/health", (req, res) => res.json({ ok: true, payments: config.payments }));
 
   // Notes go in first because they contain placeholders of their own.
@@ -102,6 +165,11 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true }
     .replaceAll("{{PUBLIC_URL}}", config.publicUrl);
   app.get("/", (req, res) => res.type("html").send(page));
 
-  app.use((req, res) => res.status(404).json({ error: "Not found. Try /llms.txt for a map of this spa." }));
+  app.use((req, res) =>
+    res.status(404).json({
+      error: "Not found.",
+      try: [`${config.publicUrl}/llms.txt`, `${config.publicUrl}/openapi.json`, `${config.publicUrl}/api/menu`],
+    }),
+  );
   return app;
 }

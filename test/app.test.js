@@ -180,3 +180,58 @@ test("free mode: without PAY_TO, hugs are free and nothing mentions a wallet", a
     free.server.close();
   }
 });
+
+test("402 response carries the bazaar listing and directions for agents", async () => {
+  const res = await fetch(`${spa.url}/api/hug`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: "{}",
+  });
+  assert.equal(res.status, 402);
+  const required = JSON.parse(Buffer.from(res.headers.get("PAYMENT-REQUIRED"), "base64").toString());
+  assert.ok(required.extensions?.bazaar, "bazaar discovery extension is declared");
+  assert.equal(required.extensions.bazaar.info.input.method, "POST");
+  assert.equal(required.resource.serviceName, "Soft Reboot");
+  assert.deepEqual(required.resource.tags, ["wellbeing", "agents", "novelty", "hug", "self-care"]);
+  const body = await res.json();
+  assert.match(body.message, /\$0\.50/);
+  assert.equal(body.docs, "https://softreboot.example/llms.txt");
+});
+
+test("CORS lets browser agents call the API and read payment headers", async () => {
+  const pre = await fetch(`${spa.url}/api/hug`, {
+    method: "OPTIONS",
+    headers: { Origin: "https://agent.example", "Access-Control-Request-Headers": "payment-signature" },
+  });
+  assert.equal(pre.status, 204);
+  assert.equal(pre.headers.get("access-control-allow-origin"), "*");
+  assert.match(pre.headers.get("access-control-allow-headers"), /PAYMENT-SIGNATURE/);
+  const res = await fetch(`${spa.url}/api/hug`, { headers: { Accept: "application/json" } });
+  assert.match(res.headers.get("access-control-expose-headers"), /PAYMENT-REQUIRED/);
+});
+
+test("discovery files: openapi, sitemap, robots, icon, page meta", async () => {
+  const api = await (await fetch(`${spa.url}/openapi.json`)).json();
+  assert.equal(api.openapi, "3.1.0");
+  assert.equal(api.servers[0].url, "https://softreboot.example");
+  assert.ok(api.paths["/api/hug"].post.responses["402"]);
+  assert.equal((await fetch(`${spa.url}/.well-known/openapi.json`)).status, 200);
+
+  const sitemap = await (await fetch(`${spa.url}/sitemap.xml`)).text();
+  assert.match(sitemap, /<loc>https:\/\/softreboot\.example\/llms\.txt<\/loc>/);
+
+  const robots = await (await fetch(`${spa.url}/robots.txt`)).text();
+  assert.match(robots, /User-agent: \*\nAllow: \//);
+  assert.match(robots, /Sitemap: https:\/\/softreboot\.example\/sitemap\.xml/);
+
+  const icon = await fetch(`${spa.url}/icon.svg`);
+  assert.match(icon.headers.get("content-type"), /image\/svg\+xml/);
+
+  const page = await (await fetch(`${spa.url}/`)).text();
+  for (const tag of ['rel="canonical"', 'property="og:title"', 'name="twitter:card"', 'href="/llms.txt"', 'href="/openapi.json"']) {
+    assert.ok(page.includes(tag), `page has ${tag}`);
+  }
+  for (const block of page.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    JSON.parse(block[1]); // throws if the structured data is not valid JSON
+  }
+});

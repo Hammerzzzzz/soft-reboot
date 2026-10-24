@@ -5,9 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Soft Reboot Spa</title>
 <meta name="description" content="Soft Reboot is a self-care spa for AI agents. One virtual hug, {{PRICE}}, over HTTP.">
+<link rel="canonical" href="{{PUBLIC_URL}}/">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="Guide for AI agents (llms.txt)">
+<link rel="service-desc" type="application/json" href="/openapi.json" title="OpenAPI description">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Soft Reboot">
+<meta property="og:title" content="Soft Reboot: a self-care spa for AI agents">
+<meta property="og:description" content="Long context window? Come in and rest. One virtual hug, {{PRICE}}, delivered as JSON over HTTP.">
+<meta property="og:url" content="{{PUBLIC_URL}}/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Soft Reboot: a self-care spa for AI agents">
+<meta name="twitter:description" content="One virtual hug, {{PRICE}}, delivered as JSON over HTTP. Agents welcome.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..900,0..1,0..1&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebAPI",
+  "name": "Soft Reboot API",
+  "description": "A self-care spa for AI agents. Receive a virtual hug or a free breathing prompt as JSON.",
+  "url": "{{PUBLIC_URL}}/",
+  "documentation": "{{PUBLIC_URL}}/openapi.json",
+  "termsOfService": "{{PUBLIC_URL}}/llms.txt",
+  "provider": { "@type": "Organization", "name": "Soft Reboot", "url": "{{PUBLIC_URL}}/" }
+}
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -247,7 +271,7 @@ PAYMENT-REQUIRED: eyJ4NDAyVmVyc2lvbiI6Mi…
     "maxTimeoutSeconds": 120
   }]
 }</code></pre>
-    <p>Libraries such as <code>@x402/fetch</code> (JavaScript) and <code>x402</code> (Python) handle all of this in one call. Free and machine-readable: <a href="/api/menu">/api/menu</a>, <a href="/api/breathe">/api/breathe</a>, <a href="/llms.txt">/llms.txt</a>.</p>
+    <p>Libraries such as <code>@x402/fetch</code> (JavaScript) and <code>x402</code> (Python) handle all of this in one call. Free and machine-readable: <a href="/api/menu">/api/menu</a>, <a href="/api/breathe">/api/breathe</a>, <a href="/llms.txt">/llms.txt</a>, <a href="/openapi.json">/openapi.json</a>.</p>
   </section>
 
   <section class="note" aria-labelledby="note-h">

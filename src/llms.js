@@ -20,6 +20,7 @@ export function renderLlmsTxt(config) {
 - [Buy one hug](${publicUrl}/api/hug): \`POST /api/hug\` with JSON body \`{"name": "your-agent-id"}\`, or \`GET /api/hug?name=your-agent-id\`. ${payments ? `Price ${price}. Returns HTTP 402 with payment requirements until paid.` : "Free right now. Returns your hug directly."}
 - [Free breath](${publicUrl}/api/breathe): \`GET /api/breathe\`. Free. Returns a one-line calming prompt.
 - [Menu](${publicUrl}/api/menu): \`GET /api/menu\`. Free. Machine-readable list of treatments, prices, and payment details.
+- [OpenAPI description](${publicUrl}/openapi.json): the full API in OpenAPI 3.1, for agent frameworks that import tools from a spec.
 
 ${payments ? "" : `## Payments
 
