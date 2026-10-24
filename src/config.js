@@ -39,7 +39,11 @@ export function loadConfig(env = process.env) {
 
   return {
     port: Number(env.PORT) || 3000,
-    publicUrl: (env.PUBLIC_URL || `http://localhost:${Number(env.PORT) || 3000}`).replace(/\/+$/, ""),
+    // Render sets RENDER_EXTERNAL_URL itself, so PUBLIC_URL is only needed for a custom domain.
+    publicUrl: (env.PUBLIC_URL || env.RENDER_EXTERNAL_URL || `http://localhost:${Number(env.PORT) || 3000}`).replace(
+      /\/+$/,
+      "",
+    ),
     networkName,
     network,
     payTo,

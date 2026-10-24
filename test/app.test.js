@@ -137,6 +137,11 @@ test("config refuses unsafe settings", () => {
   assert.throws(() => loadConfig({ PAY_TO, NETWORK: "base" }), /CDP_API_KEY_ID/);
   assert.throws(() => loadConfig({ PAY_TO, PRICE: "50 cents" }), /PRICE/);
   assert.equal(loadConfig({ PAY_TO, NETWORK: "base", CDP_API_KEY_ID: "id", CDP_API_KEY_SECRET: "s" }).network.id, "eip155:8453");
+  assert.equal(loadConfig({ PAY_TO, RENDER_EXTERNAL_URL: "https://spa.onrender.com/" }).publicUrl, "https://spa.onrender.com");
+  assert.equal(
+    loadConfig({ PAY_TO, RENDER_EXTERNAL_URL: "https://spa.onrender.com", PUBLIC_URL: "https://softreboot.spa" }).publicUrl,
+    "https://softreboot.spa",
+  );
 });
 
 test("names are cleaned before being echoed", () => {

@@ -30,7 +30,7 @@ BUYER_PRIVATE_KEY=0x... npm run pay -- http://localhost:3000/api/hug my-agent
 ## Go live (real money)
 
 1. Create API keys at [portal.cdp.coinbase.com](https://portal.cdp.coinbase.com).
-2. Set `NETWORK=base`, `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET`, and `PUBLIC_URL` to your domain.
+2. Set `NETWORK=base`, `CDP_API_KEY_ID`, and `CDP_API_KEY_SECRET`. On Render the site's address is detected automatically; set `PUBLIC_URL` only if you add a custom domain.
 3. Deploy anywhere that runs Node 20+ (Render, Railway, Fly.io, a VPS). Start command: `npm start`.
 
 The server refuses to start on mainnet without a facilitator, so testnet settings can't silently take real payments.
