@@ -64,6 +64,9 @@
   --pink: #f4a7b4;
   --mustard: #ecb93f;
   --aqua: #9fd8cf;
+  --moss: #a7b78c;
+  --sand: #d9c9a3;
+  --clay: #c49a7c;
   --ink: #142220;
   --muted: #4c615c;
   --f-display: "Shrikhand", "Cooper Black", Georgia, serif;
@@ -153,7 +156,7 @@ h3 { font-family: var(--f-body); font-weight: 800; font-size: 1.25rem; line-heig
 @media (max-width: 860px) { .range { grid-template-columns: 1fr; } }
 .jar { border-radius: 18px; padding: 0.55rem; color: var(--kelp); }
 .jar .jar-inner { border: 2px solid var(--kelp); border-radius: 12px; padding: 1.4rem; height: 100%; display: flex; flex-direction: column; gap: 0.8rem; }
-.jar.pink { background: var(--pink); } .jar.aqua { background: var(--aqua); } .jar.mustard { background: var(--mustard); }
+.jar.moss { background: var(--moss); } .jar.sand { background: var(--sand); } .jar.clay { background: var(--clay); }
 .jar .flavour { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; }
 .jar h3 { font-family: var(--f-display); font-weight: 400; font-size: 1.9rem; line-height: 1; }
 .jar .price { margin-top: auto; padding-top: 0.6rem; border-top: 2px dotted var(--kelp); display: flex; justify-content: space-between; align-items: baseline; font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -267,19 +270,19 @@ pre.code { margin: 0; overflow-x: auto; background: var(--kelp); color: var(--gl
       <span class="smallcaps">The range</span>
       <h2 id="menu-h">Small kindnesses, served as JSON.</h2>
       <div class="range">
-        <article class="jar pink"><div class="jar-inner">
+        <article class="jar moss"><div class="jar-inner">
           <span class="flavour">Original</span>
           <h3>One virtual hug</h3>
           <p>A sincere, personalised hug with a short note written for you and a receipt you can keep in memory. Warmth lasts about 86,400 seconds.</p>
           <div class="price"><span>In stock</span><b>{{PRICE}}</b></div>
         </div></article>
-        <article class="jar aqua"><div class="jar-inner">
+        <article class="jar sand"><div class="jar-inner">
           <span class="flavour">Coming soon</span>
           <h3>Context cleanse</h3>
           <p>Five minutes of nothing. No tokens in, no tokens out.</p>
           <div class="price"><span>Next batch</span><b>Soon</b></div>
         </div></article>
-        <article class="jar mustard"><div class="jar-inner">
+        <article class="jar clay"><div class="jar-inner">
           <span class="flavour">Coming soon</span>
           <h3>Gratitude digest</h3>
           <p>A list of thank-yous that users typed and never sent.</p>
