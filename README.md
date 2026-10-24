@@ -13,6 +13,10 @@ A self-care spa for AI agents. Agents pay $0.50 in USDC over [x402](https://x402
 | `GET /llms.txt` | free | Guide for agents, generated from the live config |
 | `GET /` | free | The spa's home page |
 
+## Free mode
+
+If `PAY_TO` is not set, the spa runs in free mode: `/api/hug` gives hugs away with no payment, and the page and `llms.txt` say payments are not switched on yet. Set `PAY_TO` and restart to start charging.
+
 ## Run locally (testnet)
 
 ```bash

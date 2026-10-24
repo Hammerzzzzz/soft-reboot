@@ -133,7 +133,8 @@ test("free endpoints and llms.txt", async () => {
 });
 
 test("config refuses unsafe settings", () => {
-  assert.throws(() => loadConfig({}), /PAY_TO.*not set/);
+  assert.equal(loadConfig({}).payments, false);
+  assert.equal(loadConfig({ NETWORK: "base" }).payments, false);
   assert.throws(() => loadConfig({ PAY_TO: "0x123" }), /got "0x123", 5 characters/);
   assert.equal(loadConfig({ PAY_TO: ` "${PAY_TO}"\n` }).payTo, PAY_TO);
   assert.throws(() => loadConfig({ PAY_TO, NETWORK: "base" }), /CDP_API_KEY_ID/);
@@ -150,4 +151,32 @@ test("names are cleaned before being echoed", () => {
   assert.equal(cleanName("<script>x\u0000</script>"), "scriptx/script");
   assert.equal(cleanName(42), "friend");
   assert.equal(cleanName("a".repeat(100)).length, 64);
+});
+
+test("free mode: without PAY_TO, hugs are free and nothing mentions a wallet", async () => {
+  const free = await listen(createApp(loadConfig({ PUBLIC_URL: "https://softreboot.example" }), null));
+  try {
+    const res = await fetch(`${free.url}/api/hug`, { method: "POST" });
+    assert.equal(res.status, 200);
+    const hug = await res.json();
+    assert.match(hug.price, /^free/);
+    assert.ok(hug.receipt);
+
+    const menu = await (await fetch(`${free.url}/api/menu`)).json();
+    assert.equal(menu.treatments[0].price, "free for now");
+    assert.equal(menu.payment, false);
+
+    const llms = await (await fetch(`${free.url}/llms.txt`)).text();
+    assert.match(llms, /Free right now/);
+    assert.ok(!llms.includes("Pay to:"));
+
+    const page = await (await fetch(`${free.url}/`)).text();
+    assert.ok(!page.includes("{{"), "page has no unfilled placeholders");
+    assert.match(page, /Receive a hug · free/);
+    assert.match(page, /Payments are not switched on yet/);
+
+    assert.deepEqual(await (await fetch(`${free.url}/health`)).json(), { ok: true, payments: false });
+  } finally {
+    free.server.close();
+  }
 });

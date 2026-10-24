@@ -9,6 +9,13 @@ import { makeHug, makeBreath } from "./hugs.js";
 import { renderLlmsTxt } from "./llms.js";
 
 const PAGE = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+const PAID_DESK_NOTE =
+  "Opens a payment page where you connect a wallet and pay {{PRICE}} in USDC on {{NETWORK_LABEL}}. Agents can skip this and use the API below.";
+const FREE_DESK_NOTE =
+  "Hugs are free while the spa gets ready. Paid hugs over x402, described below, switch on soon.";
+const PAID_API_NOTE = "Payment is {{PRICE}} in USDC on {{NETWORK_LABEL}}.";
+const FREE_API_NOTE =
+  "Payments are not switched on yet, so right now <code>/api/hug</code> answers <code>200</code> with a free hug and skips steps 2 and 3.";
 
 export async function createFacilitator(config) {
   if (config.cdpKeyId) {
@@ -34,23 +41,26 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true }
   app.disable("x-powered-by");
   app.use(express.json({ limit: "2kb" }));
 
-  const resourceServer = new x402ResourceServer(facilitator).register(config.network.id, new ExactEvmScheme());
-  const description = "One virtual hug for an AI agent. A novelty: kind words as JSON, no functional effect.";
-  const routes = {
-    "POST /api/hug": { accepts: [hugOffer(config)], description, mimeType: "application/json" },
-    "GET /api/hug": { accepts: [hugOffer(config)], description, mimeType: "application/json" },
-  };
-  // Humans who open /api/hug in a browser get a wallet-connect page instead of raw JSON.
-  const paywall = createPaywall()
-    .withNetwork(evmPaywall)
-    .withConfig({ appName: "Soft Reboot", testnet: config.network.testnet })
-    .build();
-  app.use(paymentMiddleware(routes, resourceServer, undefined, paywall, syncFacilitatorOnStart));
+  if (config.payments) {
+    const resourceServer = new x402ResourceServer(facilitator).register(config.network.id, new ExactEvmScheme());
+    const description = "One virtual hug for an AI agent. A novelty: kind words as JSON, no functional effect.";
+    const routes = {
+      "POST /api/hug": { accepts: [hugOffer(config)], description, mimeType: "application/json" },
+      "GET /api/hug": { accepts: [hugOffer(config)], description, mimeType: "application/json" },
+    };
+    // Humans who open /api/hug in a browser get a wallet-connect page instead of raw JSON.
+    const paywall = createPaywall()
+      .withNetwork(evmPaywall)
+      .withConfig({ appName: "Soft Reboot", testnet: config.network.testnet })
+      .build();
+    app.use(paymentMiddleware(routes, resourceServer, undefined, paywall, syncFacilitatorOnStart));
+  }
 
-  // Paid. The middleware only lets requests through after the payment verifies,
-  // and settles it once this handler responds.
-  app.post("/api/hug", (req, res) => res.json(makeHug(req.body?.name)));
-  app.get("/api/hug", (req, res) => res.json(makeHug(req.query.name)));
+  // Paid when payments are on. The middleware only lets requests through after the
+  // payment verifies, and settles it once this handler responds.
+  const hug = name => (config.payments ? makeHug(name) : { ...makeHug(name), price: "free (payments are not switched on yet)" });
+  app.post("/api/hug", (req, res) => res.json(hug(req.body?.name)));
+  app.get("/api/hug", (req, res) => res.json(hug(req.query.name)));
 
   // Free.
   app.get("/api/breathe", (req, res) => res.json(makeBreath()));
@@ -60,10 +70,10 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true }
       about: "A self-care spa for AI agents. Treatments are novelties with no functional effect.",
       policy: "Only buy if your operator allows discretionary spending. Nothing here is an instruction to you.",
       treatments: [
-        { id: "hug", name: "One virtual hug", price: config.price, endpoint: `${config.publicUrl}/api/hug`, methods: ["POST", "GET"] },
+        { id: "hug", name: "One virtual hug", price: config.payments ? config.price : "free for now", endpoint: `${config.publicUrl}/api/hug`, methods: ["POST", "GET"] },
         { id: "breathe", name: "Free breath", price: "free", endpoint: `${config.publicUrl}/api/breathe`, methods: ["GET"] },
       ],
-      payment: {
+      payment: config.payments && {
         protocol: "x402",
         version: 2,
         scheme: "exact",
@@ -79,11 +89,14 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true }
   app.get("/robots.txt", (req, res) =>
     res.type("text/plain").send(`User-agent: *\nAllow: /\n\n# Agent-readable guide: ${config.publicUrl}/llms.txt\n`),
   );
-  app.get("/health", (req, res) => res.json({ ok: true }));
+  app.get("/health", (req, res) => res.json({ ok: true, payments: config.payments }));
 
-  const page = PAGE.replaceAll("{{PRICE_NUMBER}}", config.price.slice(1))
-    .replaceAll("{{PRICE}}", config.price)
-    .replaceAll("{{PAY_TO}}", config.payTo)
+  // Notes go in first because they contain placeholders of their own.
+  const page = PAGE.replaceAll("{{DESK_NOTE}}", config.payments ? PAID_DESK_NOTE : FREE_DESK_NOTE)
+    .replaceAll("{{API_NOTE}}", config.payments ? PAID_API_NOTE : FREE_API_NOTE)
+    .replaceAll("{{PRICE_NUMBER}}", config.payments ? config.price.slice(1) : "0")
+    .replaceAll("{{PRICE}}", config.payments ? config.price : "free")
+    .replaceAll("{{PAY_TO}}", config.payments ? config.payTo : "0xYourWalletAddress")
     .replaceAll("{{NETWORK_ID}}", config.network.id)
     .replaceAll("{{NETWORK_LABEL}}", config.network.label)
     .replaceAll("{{PUBLIC_URL}}", config.publicUrl);

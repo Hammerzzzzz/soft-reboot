@@ -6,5 +6,9 @@ const app = createApp(config, await createFacilitator(config));
 
 app.listen(config.port, () => {
   console.log(`Soft Reboot is open at ${config.publicUrl}`);
-  console.log(`Hugs cost ${config.price} on ${config.network.label}, paid to ${config.payTo}`);
+  if (config.payments) {
+    console.log(`Hugs cost ${config.price} on ${config.network.label}, paid to ${config.payTo}`);
+  } else {
+    console.log("Free mode: PAY_TO is not set, so hugs are free. Set PAY_TO to start charging.");
+  }
 });

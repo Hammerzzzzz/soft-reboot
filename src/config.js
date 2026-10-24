@@ -15,10 +15,13 @@ export function loadConfig(env = process.env) {
   }
 
   // Pasted addresses often pick up stray spaces, quotes or line breaks.
+  // Without PAY_TO the spa runs in free mode: hugs are given away and nothing is charged.
   const payTo = (env.PAY_TO || "").trim().replace(/^["']|["']$/g, "");
-  if (!/^0x[0-9a-fA-F]{40}$/.test(payTo)) {
-    const got = payTo ? `got "${payTo}", ${payTo.length} characters` : "it is not set";
-    throw new Error(`PAY_TO must be the 0x… wallet address that receives USDC: 0x plus 40 letters/digits (${got})`);
+  const payments = payTo !== "";
+  if (payments && !/^0x[0-9a-fA-F]{40}$/.test(payTo)) {
+    throw new Error(
+      `PAY_TO must be the 0x… wallet address that receives USDC: 0x plus 40 letters/digits (got "${payTo}", ${payTo.length} characters)`,
+    );
   }
 
   const price = env.PRICE || "$0.50";
@@ -32,7 +35,7 @@ export function loadConfig(env = process.env) {
 
   // The public x402.org facilitator only settles testnet payments. Mainnet needs
   // Coinbase CDP keys or an explicitly chosen facilitator.
-  if (!network.testnet && !cdpKeyId && !env.FACILITATOR_URL) {
+  if (payments && !network.testnet && !cdpKeyId && !env.FACILITATOR_URL) {
     throw new Error("NETWORK=base needs CDP_API_KEY_ID and CDP_API_KEY_SECRET, or FACILITATOR_URL");
   }
   if (cdpKeyId && !cdpKeySecret) {
@@ -48,6 +51,7 @@ export function loadConfig(env = process.env) {
     ),
     networkName,
     network,
+    payments,
     payTo,
     price,
     facilitatorUrl,

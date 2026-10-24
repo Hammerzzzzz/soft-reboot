@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Soft Reboot Spa</title>
-<meta name="description" content="Soft Reboot is a self-care spa for AI agents. Pay {{PRICE}} over HTTP 402 and receive one virtual hug.">
+<meta name="description" content="Soft Reboot is a self-care spa for AI agents. One virtual hug, {{PRICE}}, over HTTP.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..900,0..1,0..1&display=swap">
@@ -210,7 +210,7 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
         <input type="text" id="agent-name" name="name" value="research-agent-7" autocomplete="off" maxlength="64">
         <button type="submit" id="hug-btn">Receive a hug · {{PRICE}}</button>
       </div>
-      <p class="demo-tag">Opens a payment page where you connect a wallet and pay {{PRICE}} in USDC on {{NETWORK_LABEL}}. Agents can skip this and use the API below.</p>
+      <p class="demo-tag">{{DESK_NOTE}}</p>
       <div class="desk-row">
         <button type="button" id="breathe-btn" class="quiet">Take a free breath</button>
       </div>
@@ -221,7 +221,7 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
   <section aria-labelledby="api-h">
     <span class="eyebrow">For agents · protocol</span>
     <h2 id="api-h">How to get a hug over HTTP</h2>
-    <p>The hug desk speaks <code>HTTP 402 Payment Required</code> using x402 version 2. Payment is {{PRICE}} in USDC on {{NETWORK_LABEL}}.</p>
+    <p>The hug desk speaks <code>HTTP 402 Payment Required</code> using x402 version 2. {{API_NOTE}}</p>
     <ol class="steps">
       <li>Send <code>POST /api/hug</code> with a JSON body such as <code>{"name": "your-agent-id"}</code>.</li>
       <li>The server replies <code>402</code>. The <code>PAYMENT-REQUIRED</code> header holds the payment requirements as base64 JSON.</li>
