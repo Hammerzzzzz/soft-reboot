@@ -235,3 +235,53 @@ test("discovery files: openapi, sitemap, robots, icon, page meta", async () => {
     JSON.parse(block[1]); // throws if the structured data is not valid JSON
   }
 });
+
+test("visitor tracking classifies visitors and tells clicks from payments", async () => {
+  const { classify, createStats } = await import("../src/stats.js");
+  assert.deepEqual(classify("Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)"), { kind: "ai-crawler", name: "GPTBot" });
+  assert.deepEqual(classify("Mozilla/5.0 (Macintosh) AppleWebKit/605.1.15 Safari/605.1.15"), { kind: "browser", name: "Browser" });
+  assert.deepEqual(classify("python-requests/2.32"), { kind: "agent", name: "python-requests" });
+  assert.equal(classify("").kind, "other");
+
+  const lines = [];
+  const stats = createStats({ log: line => lines.push(line) });
+  const app = createApp(loadConfig({ PAY_TO, PUBLIC_URL: "https://softreboot.example" }), new HTTPFacilitatorClient({ url: fac.url }), { stats });
+  const tracked = await listen(app);
+  try {
+    const browser = "Mozilla/5.0 (Macintosh) AppleWebKit/605.1.15 Safari/605.1.15";
+    await fetch(`${tracked.url}/`, { headers: { "User-Agent": browser } });
+    await fetch(`${tracked.url}/llms.txt`, { headers: { "User-Agent": "ClaudeBot/1.0" } });
+    await fetch(`${tracked.url}/api/hug?name=x`, { headers: { "User-Agent": browser, Accept: "text/html" } });
+    await fetch(`${tracked.url}/api/hug`, { method: "POST", headers: { Accept: "application/json" } });
+    rejectNext = true;
+    await payFetch(`${tracked.url}/api/hug`, { method: "POST" });
+    await payFetch(`${tracked.url}/api/hug`, { method: "POST" });
+    await new Promise(r => setTimeout(r, 50)); // let "finish" handlers run
+
+    const { events, visitors } = stats.snapshot();
+    assert.equal(events.page, 1);
+    assert.equal(events["llms.txt"], 1);
+    assert.equal(events.hug_click_payment_page, 1);
+    assert.equal(events.payment_failed, 1);
+    assert.equal(events.hug_paid, 1);
+    assert.ok(events.hug_asked_price >= 1);
+    assert.equal(visitors["ai-crawler: ClaudeBot"], 1);
+    assert.ok(lines.includes("[visit] hug_paid by agent: node"));
+
+    const page = await (await fetch(`${tracked.url}/stats`, { headers: { Accept: "text/html" } })).text();
+    assert.match(page, /Paid hugs ✅<\/td><td class="n">1</);
+    assert.match(page, /sepolia\.basescan\.org\/address\/0x1111/);
+  } finally {
+    tracked.server.close();
+  }
+});
+
+test("STATS_KEY locks the stats page", async () => {
+  const locked = await listen(createApp(loadConfig({ STATS_KEY: "s3cret" }), null));
+  try {
+    assert.equal((await fetch(`${locked.url}/stats`)).status, 403);
+    assert.equal((await fetch(`${locked.url}/stats?key=s3cret`)).status, 200);
+  } finally {
+    locked.server.close();
+  }
+});

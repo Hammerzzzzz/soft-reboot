@@ -18,6 +18,7 @@ import {
   renderRobots,
   renderSitemap,
 } from "./discovery.js";
+import { createStats, renderStatsPage } from "./stats.js";
 
 const PAGE = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
 const PAID_DESK_NOTE =
@@ -46,10 +47,12 @@ function hugOffer(config) {
   };
 }
 
-export function createApp(config, facilitator, { syncFacilitatorOnStart = true } = {}) {
+export function createApp(config, facilitator, { syncFacilitatorOnStart = true, stats = createStats() } = {}) {
   const app = express();
   app.set("trust proxy", true);
   app.disable("x-powered-by");
+  // First, so it sees how every request ends, including ones the paywall answers.
+  app.use(stats.middleware);
   app.use(express.json({ limit: "2kb" }));
 
   // Agents running in browsers need CORS to call the API and read the x402 headers.
@@ -153,6 +156,15 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true }
   app.get(["/openapi.json", "/.well-known/openapi.json"], (req, res) => res.json(renderOpenApi(config)));
   app.get(["/icon.svg", "/favicon.ico"], (req, res) => res.type("image/svg+xml").send(ICON_SVG));
   app.get("/health", (req, res) => res.json({ ok: true, payments: config.payments }));
+  // Unlisted visit counts. Set STATS_KEY to require ?key=… to view them.
+  app.get("/stats", (req, res) => {
+    if (config.statsKey && req.query.key !== config.statsKey) {
+      return res.status(403).type("text/plain").send("Add ?key=YOUR_STATS_KEY to the address to see visit counts.");
+    }
+    res.set("Cache-Control", "no-store");
+    if (req.accepts(["html", "json"]) === "json") return res.json(stats.snapshot());
+    res.type("html").send(renderStatsPage(stats.snapshot(), config));
+  });
 
   // Notes go in first because they contain placeholders of their own.
   const page = PAGE.replaceAll("{{DESK_NOTE}}", config.payments ? PAID_DESK_NOTE : FREE_DESK_NOTE)

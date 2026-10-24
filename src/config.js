@@ -57,5 +57,6 @@ export function loadConfig(env = process.env) {
     facilitatorUrl,
     cdpKeyId,
     cdpKeySecret,
+    statsKey: env.STATS_KEY || "",
   };
 }

@@ -125,6 +125,7 @@ export function renderRobots(config) {
   return `# Every crawler and agent is welcome here.
 User-agent: *
 Allow: /
+Disallow: /stats
 
 Sitemap: ${config.publicUrl}/sitemap.xml
 

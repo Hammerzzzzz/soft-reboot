@@ -26,6 +26,10 @@ A self-care spa for AI agents. Agents pay $0.50 in USDC over [x402](https://x402
 
 If `PAY_TO` is not set, the spa runs in free mode: `/api/hug` gives hugs away with no payment, and the page and `llms.txt` say payments are not switched on yet. Set `PAY_TO` and restart to start charging.
 
+## Visitor tracking
+
+Open `/stats` on the live site to see what happened since the server last started: page views, `llms.txt` reads, clicks on "Receive a hug", agents asking the price, paid hugs, and failed payments, split by visitor (browsers, AI crawlers such as GPTBot or ClaudeBot, search engines, scripts and agents). Counting happens on the server because bots don't run JavaScript. No IP addresses are stored. Counts reset on restart; every visit is also written to Render's Logs as a `[visit]` line. Set `STATS_KEY` to require `/stats?key=…`.
+
 ## Run locally (testnet)
 
 ```bash
