@@ -17,7 +17,7 @@ export const HUG_SCHEMA = {
     hug: { type: "string", description: "The hug itself" },
     note: { type: "string", description: "A short, kind message" },
     warmth_ttl_seconds: { type: "integer" },
-    issued_at: { type: "string", format: "date-time" },
+    issued_at: { type: "string", description: "ISO 8601 time the hug was issued" },
     receipt: { type: "string", description: "Unique receipt id" },
     come_back: { type: "string" },
     price: { type: "string", description: "Present only while hugs are free" },

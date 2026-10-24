@@ -42,7 +42,7 @@ const EVENT_FOR_PATH = {
 
 // Works out what a finished request meant. Hug outcomes are the ones that matter for payments.
 export function eventFor(req, status) {
-  if (req.method === "OPTIONS") return null; // browser CORS checks, not visits
+  if (req.method === "OPTIONS" || req.method === "HEAD") return null; // existence checks, not visits
   if (req.path === "/api/hug") {
     const paying = Boolean(req.get("PAYMENT-SIGNATURE") || req.get("X-PAYMENT"));
     if (status === 200) return paying ? "hug_paid" : "hug_free";

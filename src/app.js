@@ -117,6 +117,9 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true, 
       .withNetwork(evmPaywall)
       .withConfig({ appName: "Soft Reboot", testnet: config.network.testnet })
       .build();
+    // The paywall matches GET and POST only, and Express answers HEAD with the GET
+    // handler, so answer HEAD here: it carries no hug either way, but should not run one.
+    app.head("/api/hug", (req, res) => res.status(402).end());
     app.use(paymentMiddleware(routes, resourceServer, undefined, paywall, syncFacilitatorOnStart));
   }
 

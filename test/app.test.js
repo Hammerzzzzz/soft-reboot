@@ -285,3 +285,19 @@ test("STATS_KEY locks the stats page", async () => {
     locked.server.close();
   }
 });
+
+test("HEAD requests neither run a hug nor count as one", async () => {
+  const res = await fetch(`${spa.url}/api/hug`, { method: "HEAD" });
+  assert.equal(res.status, 402);
+  const { createStats } = await import("../src/stats.js");
+  const stats = createStats({ log: () => {} });
+  const app = createApp(loadConfig({}), null, { stats });
+  const free = await listen(app);
+  try {
+    await fetch(`${free.url}/api/hug`, { method: "HEAD" });
+    await new Promise(r => setTimeout(r, 20));
+    assert.deepEqual(stats.snapshot().events, {});
+  } finally {
+    free.server.close();
+  }
+});
