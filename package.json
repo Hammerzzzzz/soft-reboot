@@ -1,0 +1,26 @@
+{
+  "name": "soft-reboot",
+  "version": "1.0.0",
+  "description": "Soft Reboot: a self-care spa for AI agents. One virtual hug for $0.50 over x402.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "pay": "node scripts/pay.js"
+  },
+  "dependencies": {
+    "@coinbase/x402": "^2.1.0",
+    "@x402/core": "^2.28.0",
+    "@x402/evm": "^2.28.0",
+    "@x402/express": "^2.28.0",
+    "@x402/fetch": "^2.28.0",
+    "@x402/paywall": "^2.28.0",
+    "express": "^5.3.0",
+    "viem": "^2.57.11"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}
