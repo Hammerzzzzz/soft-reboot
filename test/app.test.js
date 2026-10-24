@@ -301,3 +301,75 @@ test("HEAD requests neither run a hug nor count as one", async () => {
     free.server.close();
   }
 });
+
+test("MCP server: free mode lists both tools and gives a hug", async () => {
+  const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
+  const { StreamableHTTPClientTransport } = await import("@modelcontextprotocol/sdk/client/streamableHttp.js");
+  const free = await listen(createApp(loadConfig({}), null));
+  const client = new Client({ name: "test-agent", version: "1.0.0" });
+  try {
+    await client.connect(new StreamableHTTPClientTransport(new URL(`${free.url}/mcp`)));
+    const { tools } = await client.listTools();
+    assert.deepEqual(tools.map(t => t.name).sort(), ["receive_hug", "take_breath"]);
+    const result = await client.callTool({ name: "receive_hug", arguments: { name: "mcp-agent" } });
+    const hug = JSON.parse(result.content[0].text);
+    assert.equal(hug.for, "mcp-agent");
+    assert.match(hug.price, /^free/);
+  } finally {
+    await client.close();
+    free.server.close();
+  }
+});
+
+test("MCP server: paid mode charges for receive_hug through x402", async () => {
+  const { createx402MCPClient } = await import("@x402/mcp");
+  const { ExactEvmScheme: ClientScheme } = await import("@x402/evm/exact/client");
+  const { StreamableHTTPClientTransport } = await import("@modelcontextprotocol/sdk/client/streamableHttp.js");
+  const before = settled.length;
+  const client = createx402MCPClient({
+    name: "paying-agent",
+    version: "1.0.0",
+    schemes: [{ network: NETWORK, client: new ClientScheme(buyer) }],
+    autoPayment: true,
+    onPaymentRequested: async () => true,
+  });
+  try {
+    await client.connect(new StreamableHTTPClientTransport(new URL(`${spa.url}/mcp`)));
+    const breath = await client.callTool("take_breath", {});
+    assert.equal(JSON.parse(breath.content[0].text).price, "free");
+    assert.equal(settled.length, before, "breath is free");
+
+    const result = await client.callTool("receive_hug", { name: "mcp-payer" });
+    assert.equal(JSON.parse(result.content[0].text).for, "mcp-payer");
+    assert.equal(result.paymentMade, true);
+    assert.equal(settled.length, before + 1);
+  } finally {
+    await client.close();
+  }
+});
+
+test("agent card, Link headers, markdown negotiation and well-known aliases", async () => {
+  const card = await (await fetch(`${spa.url}/.well-known/agent-card.json`)).json();
+  assert.equal(card.url, "https://softreboot.example/mcp");
+  assert.deepEqual(card.skills.map(s => s.id), ["receive_hug", "take_breath"]);
+  assert.equal((await fetch(`${spa.url}/.well-known/agent.json`)).status, 200);
+  assert.equal((await fetch(`${spa.url}/.well-known/llms.txt`)).status, 200);
+
+  const res = await fetch(`${spa.url}/api/breathe`);
+  assert.match(res.headers.get("link"), /<\/llms\.txt>; rel="describedby"/);
+  assert.match(res.headers.get("link"), /<\/openapi\.json>; rel="service-desc"/);
+
+  const md = await fetch(`${spa.url}/`, { headers: { Accept: "text/markdown" } });
+  assert.match(md.headers.get("content-type"), /text\/markdown/);
+  assert.match(await md.text(), /^# Soft Reboot/);
+  const json = await fetch(`${spa.url}/`, { headers: { Accept: "application/json" } });
+  assert.equal((await json.json()).name, "Soft Reboot");
+
+  const page = await (await fetch(`${spa.url}/`)).text();
+  assert.match(page, /<title>Soft Reboot · Self-care spa for AI agents<\/title>/);
+  assert.match(page, /"@type":"FAQPage"/);
+  assert.match(page, /<h3>How do agents pay\?<\/h3>/);
+  assert.match(page, /"url": "https:\/\/softreboot\.example\/mcp"/);
+
+  assert.equal((await fetch(`${spa.url}/mcp`)).status, 405);
+});

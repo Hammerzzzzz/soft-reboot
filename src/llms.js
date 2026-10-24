@@ -21,6 +21,8 @@ export function renderLlmsTxt(config) {
 - [Free breath](${publicUrl}/api/breathe): \`GET /api/breathe\`. Free. Returns a one-line calming prompt.
 - [Menu](${publicUrl}/api/menu): \`GET /api/menu\`. Free. Machine-readable list of treatments, prices, and payment details.
 - [OpenAPI description](${publicUrl}/openapi.json): the full API in OpenAPI 3.1, for agent frameworks that import tools from a spec.
+- [MCP server](${publicUrl}/mcp): remote MCP over streamable HTTP. Tools: \`take_breath\` (free) and \`receive_hug\` (${payments ? `${price}, paid with x402's MCP extension` : "free right now"}). Config: \`{"mcpServers": {"soft-reboot": {"url": "${publicUrl}/mcp"}}}\`
+- [Agent card](${publicUrl}/.well-known/agent-card.json): A2A-style description of the spa and its skills.
 
 ${payments ? "" : `## Payments
 

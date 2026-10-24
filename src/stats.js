@@ -38,6 +38,8 @@ const EVENT_FOR_PATH = {
   "/api/breathe": "breathe",
   "/robots.txt": "robots.txt",
   "/sitemap.xml": "sitemap",
+  "/.well-known/agent-card.json": "agent-card",
+  "/.well-known/agent.json": "agent-card",
 };
 
 // Works out what a finished request meant. Hug outcomes are the ones that matter for payments.
@@ -61,8 +63,8 @@ export function createStats({ log = console.log, now = () => new Date() } = {}) 
   const visitors = {};
   const recent = [];
 
-  function record(req, status) {
-    const event = eventFor(req, status);
+  function record(req, status, known) {
+    const event = known || eventFor(req, status);
     if (!event) return;
     const who = classify(req.get("User-Agent"));
     events[event] = (events[event] || 0) + 1;
@@ -72,6 +74,11 @@ export function createStats({ log = console.log, now = () => new Date() } = {}) 
     recent.unshift(entry);
     recent.length = Math.min(recent.length, 50);
     log(`[visit] ${event} by ${key}`);
+  }
+
+  // For events that are not a whole request, such as MCP tool calls.
+  function note(event, userAgent) {
+    record({ get: name => (name === "User-Agent" ? userAgent : undefined) }, null, event);
   }
 
   const middleware = (req, res, next) => {
@@ -86,7 +93,7 @@ export function createStats({ log = console.log, now = () => new Date() } = {}) 
     recent: [...recent],
   });
 
-  return { middleware, snapshot };
+  return { middleware, note, snapshot };
 }
 
 const LABELS = {
@@ -97,6 +104,10 @@ const LABELS = {
   breathe: "Free breaths",
   "robots.txt": "robots.txt reads",
   sitemap: "Sitemap reads",
+  "agent-card": "Agent card reads",
+  mcp_hug_paid: "Paid hugs over MCP ✅",
+  mcp_hug_free: "Free hugs over MCP",
+  mcp_breathe: "Free breaths over MCP",
   hug_click_payment_page: "Clicked “Receive a hug” (saw payment page)",
   hug_asked_price: "Agents asked for a hug (got the price)",
   hug_paid: "Paid hugs ✅",

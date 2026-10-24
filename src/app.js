@@ -17,7 +17,11 @@ import {
   renderOpenApi,
   renderRobots,
   renderSitemap,
+  renderAgentCard,
+  faqItems,
+  renderFaqJsonLd,
 } from "./discovery.js";
+import { createMcpHandler } from "./mcp.js";
 import { createStats, renderStatsPage } from "./stats.js";
 
 const PAGE = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
@@ -28,6 +32,12 @@ const FREE_DESK_NOTE =
 const PAID_API_NOTE = "Payment is {{PRICE}} in USDC on {{NETWORK_LABEL}}.";
 const FREE_API_NOTE =
   "Payments are not switched on yet, so right now <code>/api/hug</code> answers <code>200</code> with a free hug and skips steps 2 and 3.";
+
+const escapeHtml = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const faqHtml = config =>
+  faqItems(config)
+    .map(([q, a]) => `<div class="faq-item"><h3>${escapeHtml(q)}</h3><p>${escapeHtml(a)}</p></div>`)
+    .join("\n      ");
 
 export async function createFacilitator(config) {
   if (config.cdpKeyId) {
@@ -53,15 +63,28 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true, 
   app.disable("x-powered-by");
   // First, so it sees how every request ends, including ones the paywall answers.
   app.use(stats.middleware);
-  app.use(express.json({ limit: "2kb" }));
+  app.use(express.json({ limit: "16kb" }));
+
+  // Every response points agents to the machine-readable descriptions (RFC 8288 Link header).
+  app.use((req, res, next) => {
+    res.set(
+      "Link",
+      [
+        '</llms.txt>; rel="describedby"; type="text/plain"',
+        '</openapi.json>; rel="service-desc"; type="application/json"',
+        '</.well-known/agent-card.json>; rel="describedby"; type="application/json"',
+      ].join(", "),
+    );
+    next();
+  });
 
   // Agents running in browsers need CORS to call the API and read the x402 headers.
   app.use((req, res, next) => {
     res.set({
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, PAYMENT-SIGNATURE, X-PAYMENT",
-      "Access-Control-Expose-Headers": "PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-PAYMENT-RESPONSE",
+      "Access-Control-Allow-Headers": "Content-Type, Accept, PAYMENT-SIGNATURE, X-PAYMENT, Mcp-Session-Id, Mcp-Protocol-Version",
+      "Access-Control-Expose-Headers": "PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-PAYMENT-RESPONSE, Link, Mcp-Session-Id",
     });
     if (req.method === "OPTIONS") return res.sendStatus(204);
     next();
@@ -153,7 +176,13 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true, 
       openapi: `${config.publicUrl}/openapi.json`,
     }),
   );
-  app.get("/llms.txt", (req, res) => res.type("text/plain; charset=utf-8").send(renderLlmsTxt(config)));
+  app.get(["/llms.txt", "/.well-known/llms.txt"], (req, res) => res.type("text/plain; charset=utf-8").send(renderLlmsTxt(config)));
+  app.get(["/.well-known/agent-card.json", "/.well-known/agent.json"], (req, res) => res.json(renderAgentCard(config)));
+
+  app.post("/mcp", createMcpHandler(config, facilitator, { onToolCall: stats.note }));
+  app.all("/mcp", (req, res) =>
+    res.status(405).set("Allow", "POST").json({ error: "This MCP server is stateless. Send JSON-RPC requests with POST." }),
+  );
   app.get("/robots.txt", (req, res) => res.type("text/plain").send(renderRobots(config)));
   app.get("/sitemap.xml", (req, res) => res.type("application/xml").send(renderSitemap(config)));
   app.get(["/openapi.json", "/.well-known/openapi.json"], (req, res) => res.json(renderOpenApi(config)));
@@ -177,8 +206,18 @@ export function createApp(config, facilitator, { syncFacilitatorOnStart = true, 
     .replaceAll("{{PAY_TO}}", config.payments ? config.payTo : "0xYourWalletAddress")
     .replaceAll("{{NETWORK_ID}}", config.network.id)
     .replaceAll("{{NETWORK_LABEL}}", config.network.label)
+    .replaceAll("{{FAQ_HTML}}", faqHtml(config))
+    .replaceAll("{{FAQ_JSONLD}}", renderFaqJsonLd(config))
     .replaceAll("{{PUBLIC_URL}}", config.publicUrl);
-  app.get("/", (req, res) => res.type("html").send(page));
+  // Agents asking for Markdown or plain text get the llms.txt guide instead of HTML.
+  app.get("/", (req, res) => {
+    const wants = req.accepts(["html", "text/markdown", "text/plain", "json"]);
+    if (wants === "text/markdown" || wants === "text/plain") {
+      return res.type(`${wants}; charset=utf-8`).send(renderLlmsTxt(config));
+    }
+    if (wants === "json") return res.redirect(303, "/api/menu");
+    res.type("html").send(page);
+  });
 
   app.use((req, res) =>
     res.status(404).json({

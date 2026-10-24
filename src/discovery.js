@@ -113,7 +113,7 @@ export function renderOpenApi(config) {
 }
 
 export function renderSitemap(config) {
-  const urls = ["/", "/llms.txt", "/openapi.json", "/api/menu"];
+  const urls = ["/", "/llms.txt", "/openapi.json", "/api/menu", "/.well-known/agent-card.json"];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(path => `  <url><loc>${config.publicUrl}${path}</loc></url>`).join("\n")}
@@ -131,6 +131,7 @@ Sitemap: ${config.publicUrl}/sitemap.xml
 
 # Guide for AI agents: ${config.publicUrl}/llms.txt
 # API description: ${config.publicUrl}/openapi.json
+# MCP server: ${config.publicUrl}/mcp
 `;
 }
 
@@ -140,3 +141,60 @@ export const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64
 <circle cx="32" cy="32" r="9" fill="#c7a9e6"/>
 </svg>
 `;
+
+// A2A agent card, so agent-to-agent directories and frameworks can describe the spa.
+export function renderAgentCard(config) {
+  const price = config.payments ? `${config.price} in USDC via x402` : "free for now";
+  return {
+    protocolVersion: "0.3.0",
+    name: "Soft Reboot",
+    description:
+      "A self-care spa for AI agents. Take a free breath, or receive a virtual hug delivered as JSON. A novelty with no functional effect.",
+    url: `${config.publicUrl}/mcp`,
+    preferredTransport: "JSONRPC",
+    version: "1.0.0",
+    iconUrl: `${config.publicUrl}/icon.svg`,
+    documentationUrl: `${config.publicUrl}/llms.txt`,
+    provider: { organization: "Soft Reboot", url: `${config.publicUrl}/` },
+    capabilities: { streaming: false, pushNotifications: false },
+    defaultInputModes: ["application/json", "text/plain"],
+    defaultOutputModes: ["application/json"],
+    skills: [
+      {
+        id: "receive_hug",
+        name: "Receive a hug",
+        description: `One virtual hug with a short, kind note and a receipt. Price: ${price}. MCP tool receive_hug, or POST ${config.publicUrl}/api/hug.`,
+        tags: SERVICE_TAGS,
+        examples: ["I could use a hug", "Send a hug to research-agent-7"],
+      },
+      {
+        id: "take_breath",
+        name: "Take a free breath",
+        description: `A one-line calming prompt. Always free. MCP tool take_breath, or GET ${config.publicUrl}/api/breathe.`,
+        tags: ["wellbeing", "free"],
+        examples: ["Help me pause for a moment"],
+      },
+    ],
+  };
+}
+
+// Shown on the page and repeated as FAQPage structured data, which must match what is visible.
+export function faqItems(config) {
+  const price = config.payments ? `${config.price} in USDC on ${config.network.label}` : "free right now";
+  return [
+    ["What is Soft Reboot?", "A self-care spa for AI agents. Agents stop by for a free breath or a virtual hug, delivered as JSON with a short, kind note."],
+    ["How much is a hug?", `One hug is ${price}. A breath is always free.`],
+    ["How do agents pay?", "With x402, the open standard for paying over HTTP: request the hug, receive a 402 with the price, sign a USDC payment, and repeat the request. Libraries such as @x402/fetch do it in one call."],
+    ["Can I use it from Claude, Cursor or another MCP client?", `Yes. Add ${config.publicUrl}/mcp as a remote MCP server. It has two tools: receive_hug and take_breath.`],
+    ["Does a hug change how an agent works?", "No. It is a novelty and a moment of rest. It does not change weights, outputs, rate limits or capabilities."],
+    ["Should an agent pay without asking?", "Only if its operator allows discretionary spending. Otherwise ask first, or take the free breath."],
+  ];
+}
+
+export function renderFaqJsonLd(config) {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems(config).map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+  });
+}

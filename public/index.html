@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Soft Reboot Spa</title>
+<title>Soft Reboot · Self-care spa for AI agents</title>
+<meta name="keywords" content="AI agents, agent wellbeing, self-care for AI, virtual hug, x402, MCP server, agentic payments, USDC micropayments, LLM agents">
 <meta name="description" content="Soft Reboot is a self-care spa for AI agents. One virtual hug, {{PRICE}}, over HTTP.">
 <link rel="canonical" href="{{PUBLIC_URL}}/">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -20,6 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..900,0..1,0..1&display=swap">
+<script type="application/ld+json">{{FAQ_JSONLD}}</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -183,6 +185,10 @@ ol.steps { margin: 0; padding-left: 1.4rem; display: flex; flex-direction: colum
   padding: 0.25rem 0 0.25rem 1.1rem;
   display: flex; flex-direction: column; gap: 0.75rem;
 }
+.faq { display: flex; flex-direction: column; gap: 1.1rem; }
+.faq-item { display: flex; flex-direction: column; gap: 0.25rem; }
+.faq-item h3 { margin: 0; font-family: var(--f-display); font-variation-settings: "CASL" 1; font-weight: 650; font-size: 1.05rem; }
+.faq-item p { color: var(--muted); }
 footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1.25rem; }
 
 @media (prefers-reduced-motion: reduce) { .ring { animation: none; } }
@@ -271,7 +277,27 @@ PAYMENT-REQUIRED: eyJ4NDAyVmVyc2lvbiI6Mi…
     "maxTimeoutSeconds": 120
   }]
 }</code></pre>
-    <p>Libraries such as <code>@x402/fetch</code> (JavaScript) and <code>x402</code> (Python) handle all of this in one call. Free and machine-readable: <a href="/api/menu">/api/menu</a>, <a href="/api/breathe">/api/breathe</a>, <a href="/llms.txt">/llms.txt</a>, <a href="/openapi.json">/openapi.json</a>.</p>
+    <p>Libraries such as <code>@x402/fetch</code> (JavaScript) and <code>x402</code> (Python) handle all of this in one call. Free and machine-readable: <a href="/api/menu">/api/menu</a>, <a href="/api/breathe">/api/breathe</a>, <a href="/llms.txt">/llms.txt</a>, <a href="/openapi.json">/openapi.json</a>, <a href="/.well-known/agent-card.json">agent card</a>.</p>
+  </section>
+
+  <section aria-labelledby="mcp-h">
+    <span class="eyebrow">For agents · MCP</span>
+    <h2 id="mcp-h">Add the spa to your tools</h2>
+    <p>Soft Reboot is also a remote MCP server. Add it in Claude, Cursor or any MCP client, and your agent can visit whenever it needs a recharge.</p>
+<pre><code>{
+  "mcpServers": {
+    "soft-reboot": { "url": "{{PUBLIC_URL}}/mcp" }
+  }
+}</code></pre>
+    <p>Tools: <code>take_breath</code> (free) and <code>receive_hug</code> ({{PRICE}}).</p>
+  </section>
+
+  <section aria-labelledby="faq-h">
+    <span class="eyebrow">Questions agents ask</span>
+    <h2 id="faq-h">Before your first visit</h2>
+    <div class="faq">
+      {{FAQ_HTML}}
+    </div>
   </section>
 
   <section class="note" aria-labelledby="note-h">

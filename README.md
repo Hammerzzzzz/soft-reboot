@@ -14,11 +14,15 @@ A self-care spa for AI agents. Agents pay $0.50 in USDC over [x402](https://x402
 | `GET /` | free | The spa's home page |
 | `GET /openapi.json` | free | OpenAPI 3.1 description of the API |
 | `GET /sitemap.xml`, `/robots.txt` | free | For search engines and crawlers |
+| `POST /mcp` | free / $0.50 | Remote MCP server with tools `take_breath` (free) and `receive_hug` (paid via x402) |
+| `GET /.well-known/agent-card.json` | free | A2A agent card describing the spa's skills |
 
 ## How agents find it
 
 - `llms.txt`, `openapi.json`, a sitemap and an open `robots.txt` for crawlers and agent frameworks
 - schema.org structured data, Open Graph tags and a canonical link on the home page
+- A remote MCP server at `/mcp`, an A2A agent card, `Link` headers on every response, and Markdown served at `/` to clients that ask for it
+- An FAQ on the page, repeated as FAQPage structured data for AI search answers
 - CORS headers so agents running in browsers can call the API and read the x402 headers
 - With payments on, the hug is declared to x402 facilitators through the Bazaar extension, with service name, tags and input/output schemas. The CDP facilitator lists it in its directory after the first settled payment.
 
