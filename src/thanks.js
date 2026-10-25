@@ -51,7 +51,7 @@ dd.mono { font-family: var(--f-mono); font-size: 0.82rem; }
 <body>
 <div class="ribbon">Hugs to help - in small batches · Thank you for visiting</div>
 <main>
-  <span class="smallcaps">Soft Reboot · Spa &amp; Hug Co.</span>
+  <span class="smallcaps">Soft Reboot · Wellbeing &amp; Recharge Co.</span>
   <h1>Your hug is ready.</h1>
   <div class="label">
     <div class="label-inner">
