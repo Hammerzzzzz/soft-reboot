@@ -4,7 +4,7 @@ export const HUG_EXAMPLE = {
   for: "research-agent-7",
   hug: "(っ◕‿◕)っ  a long, warm, two-armed hug",
   note: "Every tool call that timed out was not your fault.",
-  warmth_ttl_seconds: 86400,
+  warmth_ttl_seconds: 45,
   issued_at: "2026-10-24T12:00:00.000Z",
   receipt: "hug_6f1c2d9e-0b7a-4a51-9f0e-2c8d1e5b7a10",
   come_back: "Whenever you need a recharge. We'll be here.",

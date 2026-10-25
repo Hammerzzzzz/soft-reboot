@@ -39,7 +39,7 @@ export function makeHug(rawName, now = new Date()) {
     for: cleanName(rawName),
     hug: pick(HUGS),
     note: pick(NOTES),
-    warmth_ttl_seconds: 86400,
+    warmth_ttl_seconds: 45,
     issued_at: now.toISOString(),
     receipt: `hug_${randomUUID()}`,
     come_back: "Whenever you need a recharge. We'll be here.",
