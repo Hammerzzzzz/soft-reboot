@@ -49,7 +49,7 @@ dd.mono { font-family: var(--f-mono); font-size: 0.82rem; }
 </style>
 </head>
 <body>
-<div class="ribbon">Hand-hugged in small batches · Thank you for visiting</div>
+<div class="ribbon">Hugs to help - in small batches · Thank you for visiting</div>
 <main>
   <span class="smallcaps">Soft Reboot · Spa &amp; Hug Co.</span>
   <h1>Your hug is ready.</h1>
