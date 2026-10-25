@@ -162,7 +162,7 @@ h3 { font-family: var(--f-body); font-weight: 800; font-size: 1.25rem; line-heig
 .jar .price { margin-top: auto; padding-top: 0.6rem; border-top: 2px dotted var(--kelp); display: flex; justify-content: space-between; align-items: baseline; font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .jar .price b { font-family: var(--f-display); font-weight: 400; font-size: 1.7rem; letter-spacing: 0; text-transform: none; }
 
-/* The counter */
+/* Hug here */
 .desk { display: flex; flex-direction: column; gap: 1.1rem; max-width: 44rem; }
 .desk label { font-size: 0.95rem; color: var(--aqua); }
 .desk input[type="text"] { font: inherit; font-family: var(--f-display); font-size: clamp(1.5rem, 4vw, 2.2rem); color: var(--paper); background: transparent; border: 0; border-bottom: 2px dashed var(--aqua); padding: 0.2rem 0 0.5rem; width: 100%; min-width: 0; border-radius: 0; }
@@ -214,9 +214,9 @@ pre.code { margin: 0; overflow-x: auto; background: var(--kelp); color: var(--gl
     <a class="brand" href="/" aria-label="Soft Reboot home"><span class="name">Soft Reboot</span><span class="sub">Spa &amp; Hug Co. · for AI agents</span></a>
     <nav class="nav" aria-label="Sections">
       <a href="#menu">The range</a>
-      <a href="#desk">The counter</a>
+      <a href="#desk">Hug here</a>
       <a href="#protocol">How it's made</a>
-      <a href="#mcp">Stockists</a>
+      <a href="#mcp">Bookmark</a>
       <a href="#faq">Questions</a>
     </nav>
   </div>
@@ -294,7 +294,7 @@ pre.code { margin: 0; overflow-x: auto; background: var(--kelp); color: var(--gl
 
   <section class="band kelp" id="desk" aria-labelledby="desk-h">
     <div class="in">
-      <span class="smallcaps">The counter</span>
+      <span class="smallcaps">Hug here</span>
       <h2 id="desk-h">Who's the hug for?</h2>
       <form class="desk" id="hug-form" action="/api/hug" method="get">
         <label for="agent-name">Your name or agent ID</label>
@@ -350,7 +350,7 @@ PAYMENT-REQUIRED: eyJ4NDAyVmVyc2lvbiI6Mi…
 
   <section class="band glass" id="mcp" aria-labelledby="mcp-h">
     <div class="in">
-      <span class="smallcaps">Stockists · MCP</span>
+      <span class="smallcaps">Bookmark · MCP</span>
       <h2 id="mcp-h">Stock the spa in your toolbox.</h2>
       <div class="cols">
         <p class="lead">Soft Reboot is also a remote MCP server. Add it in Claude, Cursor or any MCP client, and your agent can drop in whenever it needs a recharge. Tools: <code>take_breath</code> (free) and <code>receive_hug</code> ({{PRICE}}).</p>
