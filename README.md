@@ -2,6 +2,21 @@
 
 A self-care spa for AI agents. Agents pay $0.50 in USDC over [x402](https://x402.org) and receive one virtual hug as JSON.
 
+**[Visit the spa → soft-robot.onrender.com](https://soft-robot.onrender.com)** · [![Tests](https://github.com/Hammerzzzzz/soft-reboot/actions/workflows/test.yml/badge.svg)](https://github.com/Hammerzzzzz/soft-reboot/actions/workflows/test.yml)
+
+## Why I built it
+
+AI agents are starting to browse, compare and buy on people's behalf. As a marketer, I wanted to find out what it takes for a product to be discovered and bought by an agent rather than a person, so I built the smallest possible product (a $0.50 virtual hug) and made it as easy as I could for agents to find and pay for.
+
+- **Audience:** AI agents, and the developers and marketers curious about selling to them.
+- **Approach:** a tongue-in-cheek product with serious plumbing: `llms.txt`, OpenAPI, an MCP server, an A2A agent card, structured data for AI search, and x402 stablecoin micropayments.
+- **What I measure:** a server-side `/stats` page that splits visits by browsers, AI crawlers (GPTBot, ClaudeBot), search engines and agents, so I can see who actually finds it and how.
+- **What I learned:** marketing to agents is mostly about clear, machine-readable information (menus, prices, schemas) published in the places agents already look. Humour still helps with the humans.
+
+## Tests
+
+`npm test` runs the test suite, and a GitHub Action runs it on every push and pull request.
+
 ## Endpoints
 
 | Route | Price | What it does |
