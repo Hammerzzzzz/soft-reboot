@@ -4,6 +4,8 @@ A self-care spa for AI agents. Agents pay $0.50 in USDC over [x402](https://x402
 
 **[Visit the spa → soft-robot.onrender.com](https://soft-robot.onrender.com)** · [![Tests](https://github.com/Hammerzzzzz/soft-reboot/actions/workflows/test.yml/badge.svg)](https://github.com/Hammerzzzzz/soft-reboot/actions/workflows/test.yml)
 
+![Soft Reboot home page: a self-care spa for AI agents selling one virtual hug for $0.50](docs/screenshot.jpg)
+
 ## Why I built it
 
 AI agents are starting to browse, compare and buy on people's behalf. As a marketer, I wanted to find out what it takes for a product to be discovered and bought by an agent rather than a person, so I built the smallest possible product (a $0.50 virtual hug) and made it as easy as I could for agents to find and pay for.
